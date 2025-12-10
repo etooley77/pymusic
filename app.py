@@ -3,6 +3,8 @@ import sys
 
 from constants import *
 
+from button import TextButton
+
 # 
 class MusicApp():
     def __init__(self):
@@ -22,12 +24,27 @@ class MusicApp():
         # Font
         self.title_font = pygame.font.Font("assets/bold.ttf", 48)
         self.font = pygame.font.Font("assets/regular.ttf", 24)
+        self.font16 = pygame.font.Font("assets/regular.ttf", 16)
 
         # Music variables
         self.curr_song = None
         self.playing = False
 
+    # 
     # Screens
+    # 
+
+    def draw_navbar(self):
+        nav_title = self.font.render("Spotify", True, WHITE)
+        self.screen.blit(nav_title, (WIDTH / 8 - nav_title.get_width() / 2, 5))
+
+        
+
+    # Home
+    def draw_home(self):
+        all_playlists = self.title_font.render("Your Playlists", True, WHITE)
+        self.screen.blit(all_playlists, (WIDTH / 2 - all_playlists.get_width() / 2, all_playlists.get_height() + 5))
+
     def home(self):
         self.on_screen = True
         while self.on_screen:
@@ -41,6 +58,10 @@ class MusicApp():
             
             # Clear screen for next frame
             self.screen.fill(BLACK)
+
+            # Draw screen
+            self.draw_navbar()
+            self.draw_home()
 
             # Update display
             pygame.display.flip()
