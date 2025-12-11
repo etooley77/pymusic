@@ -24,4 +24,4 @@ class Song():
 
     # 
     def draw():
-        pass
+        return
