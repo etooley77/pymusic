@@ -55,14 +55,18 @@ class MusicApp():
         nav_title = self.font.render("App", True, WHITE)
         self.screen.blit(nav_title, (WIDTH / 8 - nav_title.get_width() / 2, 5))
 
-    def draw_songs(self):
+    def draw_songs(self, start_pos):
+        pos = start_pos
         for song in self.songs:
-            pass
+            song.draw(self.screen, pos)
+            pos += 50
 
     # Home
     def draw_home(self):
         all_playlists = self.title_font.render("Your Playlists", True, WHITE)
         self.screen.blit(all_playlists, (WIDTH / 2 - all_playlists.get_width() / 2, all_playlists.get_height() + 5))
+
+        self.draw_songs(150)
 
     def home(self):
         self.on_screen = True
