@@ -2,8 +2,11 @@ import pygame
 import sys
 
 from constants import *
+from components.playlists import playlists
 
-from button import TextButton
+from components.button import TextButton
+from components.song import Song
+# from components.playlist import Playlist
 
 # 
 class MusicApp():
@@ -18,6 +21,9 @@ class MusicApp():
         icon = pygame.image.load("assets/icon.ico").convert_alpha()
         pygame.display.set_icon(icon)
 
+        self.play_icon = pygame.image.load("assets/play.png").convert_alpha()
+        self.pause_icon = pygame.image.load("assets/pause.png").convert_alpha()
+
         self.curr_screen = "HOME"
         self.on_screen = True
 
@@ -30,15 +36,28 @@ class MusicApp():
         self.curr_song = None
         self.playing = False
 
+        self.songs = []
+
+        self.setup()
+
+    def setup(self):
+        for song_file in playlists[0][2]:
+            obj = Song(song_file)
+            self.songs.append(obj)
+
+        print(self.songs)
+
     # 
     # Screens
     # 
 
     def draw_navbar(self):
-        nav_title = self.font.render("Spotify", True, WHITE)
+        nav_title = self.font.render("App", True, WHITE)
         self.screen.blit(nav_title, (WIDTH / 8 - nav_title.get_width() / 2, 5))
 
-        
+    def draw_songs(self):
+        for song in self.songs:
+            pass
 
     # Home
     def draw_home(self):
@@ -52,6 +71,11 @@ class MusicApp():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                # 
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.curr_song = self.songs[0]
+                        self.curr_song.play_pause()
 
             # Get delta time
             dt = self.clock.tick(60)
