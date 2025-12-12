@@ -29,29 +29,32 @@ class Song():
             pygame.mixer.music.load(self.file)
             self.loaded = True
 
-    def reset(self):
-        self.loaded = False
-        self.icon = self.play
-        self.playing = False
-        self.is_paused = False
-
-    def play_pause(self):
-        if self.is_playing:
-            if self.is_paused:
-                pygame.mixer.music.unpause()
-                self.is_paused = False
-                self.icon = self.pause
-            else:
-                pygame.mixer.music.pause()
-                self.is_paused = True
-                self.icon = self.play
-        else:
+    def play(self):
+        if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play(0)
             self.is_playing = True
             self.icon = self.pause
 
+    def pause(self):
+        if self.is_paused:
+            pygame.mixer.music.unpause()
+            self.is_paused = False
+            self.icon = self.pause
+        else:
+            pygame.mixer.music.pause()
+            self.is_paused = True
+            self.icon = self.play
+
+    def stop(self):
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
+            self.loaded = False
+            self.icon = self.play
+            self.playing = False
+            self.is_paused = False
+
     def check_click(self, mouse_pos):
-        if distance(mouse_pos, self.icon_pos) < 15:
+        if distance(mouse_pos, self.icon_pos) < 10:
             return True
 
     # 

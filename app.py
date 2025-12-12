@@ -81,23 +81,26 @@ class MusicApp():
                     if event.key == pygame.K_SPACE:
                         self.curr_song = self.songs[0]
                         self.curr_song.setup()
-                        self.curr_song.play_pause()
+                        self.curr_song.play()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
 
                     for song in self.songs:
+                        # Check which song was clicked
                         if song.check_click(mouse_pos):
-                            if self.curr_song != song:
-                                # Reset current song
-                                if self.curr_song != None:
-                                    self.curr_song.reset()
-
-                                # Set new current song
+                            # If no current song
+                            if self.curr_song == None:
                                 self.curr_song = song
                                 self.curr_song.setup()
-                                self.curr_song.play_pause()
+                                self.curr_song.play()
+                            # If the selected song is different than the current song
+                            elif song != self.curr_song:
+                                self.curr_song.stop()
+                                self.curr_song = song
+                                self.curr_song.setup()
+                                self.curr_song.play()
                             else:
-                                self.curr_song.play_pause()
+                                self.curr_song.pause()
 
             # Get delta time
             dt = self.clock.tick(60)
