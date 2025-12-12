@@ -82,6 +82,22 @@ class MusicApp():
                         self.curr_song = self.songs[0]
                         self.curr_song.setup()
                         self.curr_song.play_pause()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+
+                    for song in self.songs:
+                        if song.check_click(mouse_pos):
+                            if self.curr_song != song:
+                                # Reset current song
+                                if self.curr_song != None:
+                                    self.curr_song.reset()
+
+                                # Set new current song
+                                self.curr_song = song
+                                self.curr_song.setup()
+                                self.curr_song.play_pause()
+                            else:
+                                self.curr_song.play_pause()
 
             # Get delta time
             dt = self.clock.tick(60)
