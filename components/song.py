@@ -6,12 +6,13 @@ from constants import WIDTH, WHITE
 class Song():
     def __init__(self, file):
         self.file = file
+        self.loaded = False
 
         self.is_playing = False
         self.is_paused = False
 
         # Load files
-        pygame.mixer.music.load(file)
+        # pygame.mixer.music.load(self.file)
 
         self.play = pygame.image.load("assets/play.png").convert_alpha()
         self.pause = pygame.image.load("assets/pause.png").convert_alpha()
@@ -20,7 +21,12 @@ class Song():
 
         # Font
         self.name_font = pygame.font.Font("assets/regular.ttf", 16)
-    
+
+    def setup(self):
+        if not self.loaded:
+            pygame.mixer.music.load(self.file)
+            self.loaded = True
+
     def play_pause(self):
         if self.is_playing:
             if self.is_paused:

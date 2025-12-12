@@ -12,6 +12,7 @@ from components.song import Song
 class MusicApp():
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.clock = pygame.time.Clock()
 
         # Screen setup
@@ -79,6 +80,7 @@ class MusicApp():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.curr_song = self.songs[0]
+                        self.curr_song.setup()
                         self.curr_song.play_pause()
 
             # Get delta time
