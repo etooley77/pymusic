@@ -87,53 +87,54 @@ class MusicApp():
                     if event.key == pygame.K_SPACE:
                         pass
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
+                    if event.button == 1:
+                        mouse_pos = pygame.mouse.get_pos()
 
-                    for song in self.songs:
-                        # Check which song was clicked
-                        if song.check_click(mouse_pos):
-                            # If no current song (usually only at start of program)
-                            if self.curr_song == None:
-                                self.curr_song = song # Set current song to correct song
-                                if not self.curr_song.loaded:
-                                    # Loads the song to the mixer
+                        for song in self.songs:
+                            # Check which song was clicked
+                            if song.check_click(mouse_pos):
+                                # If no current song (usually only at start of program)
+                                if self.curr_song == None:
+                                    self.curr_song = song # Set current song to correct song
+                                    if not self.curr_song.loaded:
+                                        # Loads the song to the mixer
+                                        pygame.mixer.music.load(self.curr_song.file)
+                                        self.curr_song.loaded = True
+
+                                    # Play the song and update program states, which updates the UI
+                                    pygame.mixer.music.play()
+                                    self.playing = True
+                                    self.curr_song.update(self.playing)
+
+                                # If the selected song is different than the current song
+                                elif song != self.curr_song:
+                                    # Stop old song and setup new song, which updates the UI
+                                    pygame.mixer.music.stop()
+                                    self.playing = False
+                                    self.curr_song.update(self.playing)
+
+                                    # Load the new song onto the mixer and update song state `loaded`
+                                    self.curr_song = song
                                     pygame.mixer.music.load(self.curr_song.file)
                                     self.curr_song.loaded = True
 
-                                # Play the song and update program states, which updates the UI
-                                pygame.mixer.music.play()
-                                self.playing = True
-                                self.curr_song.update(self.playing)
+                                    # Play new song and update program states, which updates the UI
+                                    pygame.mixer.music.play()
+                                    self.playing = True
+                                    self.curr_song.update(self.playing)
 
-                            # If the selected song is different than the current song
-                            elif song != self.curr_song:
-                                # Stop old song and setup new song, which updates the UI
-                                pygame.mixer.music.stop()
-                                self.playing = False
-                                self.curr_song.update(self.playing)
-
-                                # Load the new song onto the mixer and update song state `loaded`
-                                self.curr_song = song
-                                pygame.mixer.music.load(self.curr_song.file)
-                                self.curr_song.loaded = True
-
-                                # Play new song and update program states, which updates the UI
-                                pygame.mixer.music.play()
-                                self.playing = True
-                                self.curr_song.update(self.playing)
-
-                            # If the user clicks on the same song (pause/unpause functionality)
-                            else:
-                                # Make sure that the user cannot pause or unpause songs before a song has even been played
-                                if self.curr_song != None:
-                                    if self.playing: # Song is playing -> pause
-                                        self.playing = False
-                                        pygame.mixer.music.pause()
-                                        self.curr_song.update(self.playing)
-                                    else: # Song is paused -> unpause
-                                        self.playing = True
-                                        pygame.mixer.music.unpause()
-                                        self.curr_song.update(self.playing)
+                                # If the user clicks on the same song (pause/unpause functionality)
+                                else:
+                                    # Make sure that the user cannot pause or unpause songs before a song has even been played
+                                    if self.curr_song != None:
+                                        if self.playing: # Song is playing -> pause
+                                            self.playing = False
+                                            pygame.mixer.music.pause()
+                                            self.curr_song.update(self.playing)
+                                        else: # Song is paused -> unpause
+                                            self.playing = True
+                                            pygame.mixer.music.unpause()
+                                            self.curr_song.update(self.playing)
 
 
 
