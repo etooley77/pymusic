@@ -16,10 +16,10 @@ class Song():
         # Load files
         # pygame.mixer.music.load(self.file)
 
-        self.play = pygame.image.load("assets/play.png").convert_alpha()
-        self.pause = pygame.image.load("assets/pause.png").convert_alpha()
+        self.play_button = pygame.image.load("assets/play.png").convert_alpha()
+        self.pause_button = pygame.image.load("assets/pause.png").convert_alpha()
 
-        self.icon = self.play
+        self.icon = self.play_button
 
         # Font
         self.name_font = pygame.font.Font("assets/regular.ttf", 16)
@@ -33,23 +33,22 @@ class Song():
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play(0)
             self.is_playing = True
-            self.icon = self.pause
+            self.icon = self.pause_button
 
     def pause(self):
         if self.is_paused:
             pygame.mixer.music.unpause()
             self.is_paused = False
-            self.icon = self.pause
+            self.icon = self.pause_button
         else:
             pygame.mixer.music.pause()
             self.is_paused = True
-            self.icon = self.play
+            self.icon = self.play_button
 
     def stop(self):
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
-            self.loaded = False
-            self.icon = self.play
+            self.icon = self.play_button
             self.playing = False
             self.is_paused = False
 
