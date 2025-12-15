@@ -28,46 +28,52 @@ class MusicApp():
         self.curr_screen = "HOME"
         self.on_screen = True
 
+        self.scroll_offset = 0
+
         # Font
         self.title_font = pygame.font.Font("assets/bold.ttf", 48)
         self.font = pygame.font.Font("assets/regular.ttf", 24)
         self.font16 = pygame.font.Font("assets/regular.ttf", 16)
 
-        # Music variables
+        # Current song variables
         self.curr_song = None
         self.playing = False
 
+        # Song setup
         self.songs = []
 
         self.setup()
 
+    # Creates a Song object for every file found. Song object do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
+        y_pos = 150 - self.scroll_offset
+
         for song_file in playlists[0][2]:
-            obj = Song(song_file)
+            obj = Song(song_file, self.play_icon, self.pause_icon)
             self.songs.append(obj)
 
-        print(self.songs)
+            # Define a layout for the current song, and define the starting position for the next song, so no overlapping occurs
+            obj.layout(y_pos)
+            y_pos += 50
 
     # 
     # Screens
     # 
 
     def draw_navbar(self):
-        nav_title = self.font.render("App", True, WHITE)
+        nav_title = self.font.render("Music App", True, WHITE)
         self.screen.blit(nav_title, (WIDTH / 8 - nav_title.get_width() / 2, 5))
 
-    def draw_songs(self, start_pos):
-        pos = start_pos
+    def draw_songs(self):
         for song in self.songs:
-            song.draw(self.screen, pos)
-            pos += 50
+            song.draw(self.screen)
 
     # Home
     def draw_home(self):
-        all_playlists = self.title_font.render("Your Playlists", True, WHITE)
+        all_playlists = self.title_font.render("Your Music", True, WHITE)
         self.screen.blit(all_playlists, (WIDTH / 2 - all_playlists.get_width() / 2, all_playlists.get_height() + 5))
 
-        self.draw_songs(150)
+        self.draw_songs()
 
     def home(self):
         self.on_screen = True
@@ -79,31 +85,60 @@ class MusicApp():
                 # 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        self.curr_song = self.songs[0]
-                        self.curr_song.setup()
-                        self.curr_song.play()
+                        pass
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
 
                     for song in self.songs:
                         # Check which song was clicked
                         if song.check_click(mouse_pos):
-                            # If no current song
+                            # If no current song (usually only at start of program)
                             if self.curr_song == None:
-                                self.curr_song = song
-                                self.curr_song.setup()
-                                self.curr_song.play()
+                                self.curr_song = song # Set current song to correct song
+                                if not self.curr_song.loaded:
+                                    # Loads the song to the mixer
+                                    pygame.mixer.music.load(self.curr_song.file)
+                                    self.curr_song.loaded = True
+
+                                # Play the song and update program states, which updates the UI
+                                pygame.mixer.music.play()
+                                self.playing = True
+                                self.curr_song.update(self.playing)
+
                             # If the selected song is different than the current song
                             elif song != self.curr_song:
-                                self.curr_song.stop()
+                                # Stop old song and setup new song, which updates the UI
+                                pygame.mixer.music.stop()
+                                self.playing = False
+                                self.curr_song.update(self.playing)
+
+                                # Load the new song onto the mixer and update song state `loaded`
                                 self.curr_song = song
-                                self.curr_song.setup()
-                                self.curr_song.play()
+                                pygame.mixer.music.load(self.curr_song.file)
+                                self.curr_song.loaded = True
+
+                                # Play new song and update program states, which updates the UI
+                                pygame.mixer.music.play()
+                                self.playing = True
+                                self.curr_song.update(self.playing)
+
+                            # If the user clicks on the same song (pause/unpause functionality)
                             else:
-                                self.curr_song.pause()
+                                # Make sure that the user cannot pause or unpause songs before a song has even been played
+                                if self.curr_song != None:
+                                    if self.playing: # Song is playing -> pause
+                                        self.playing = False
+                                        pygame.mixer.music.pause()
+                                        self.curr_song.update(self.playing)
+                                    else: # Song is paused -> unpause
+                                        self.playing = True
+                                        pygame.mixer.music.unpause()
+                                        self.curr_song.update(self.playing)
+
+
 
             # Get delta time
-            dt = self.clock.tick(60)
+            # dt = self.clock.tick(60)
             
             # Clear screen for next frame
             self.screen.fill(BLACK)
