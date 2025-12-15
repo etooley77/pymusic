@@ -1,3 +1,8 @@
+import os
+
+folder = 'music'
+
 playlists = [
-    ['all_music', 'All Music', ['music/all_seeing_eye.wav', 'music/ex_nihilo.wav']]
+	# ['reference name', 'display name', [songs contained]]
+	['all_music', 'All Music', [f'{folder}/{f}' for f in os.listdir(folder) if f.split('.')[1] == 'wav']]
 ]

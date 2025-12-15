@@ -1,68 +1,52 @@
 import pygame
 
-from constants import WIDTH, WHITE
+from constants import WIDTH, WHITE, DARK_GRAY
 
 from helpers import distance
 
 # 
 class Song():
-    def __init__(self, file):
+    def __init__(self, file, play_button, pause_button):
         self.file = file
         self.loaded = False
 
-        self.is_playing = False
-        self.is_paused = False
+        self.play_icon = play_button
+        self.pause_icon = pause_button
 
-        # Load files
-        # pygame.mixer.music.load(self.file)
-
-        self.play_button = pygame.image.load("assets/play.png").convert_alpha()
-        self.pause_button = pygame.image.load("assets/pause.png").convert_alpha()
-
-        self.icon = self.play_button
+        self.icon = self.play_icon
 
         # Font
         self.name_font = pygame.font.Font("assets/regular.ttf", 16)
 
-    def setup(self):
-        if not self.loaded:
-            pygame.mixer.music.load(self.file)
-            self.loaded = True
+        # Handle the layout
+        self.rect = None
+        self.icon_pos = None
 
-    def play(self):
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.play(0)
-            self.is_playing = True
-            self.icon = self.pause_button
-
-    def pause(self):
-        if self.is_paused:
-            pygame.mixer.music.unpause()
-            self.is_paused = False
-            self.icon = self.pause_button
+    def update(self, playing):
+        if playing:
+            self.icon = self.pause_icon
         else:
-            pygame.mixer.music.pause()
-            self.is_paused = True
-            self.icon = self.play_button
-
-    def stop(self):
-        if pygame.mixer.music.get_busy():
-            pygame.mixer.music.stop()
-            self.icon = self.play_button
-            self.playing = False
-            self.is_paused = False
+            self.icon = self.play_icon
 
     def check_click(self, mouse_pos):
-        if distance(mouse_pos, self.icon_pos) < 10:
+        if self.rect.collidepoint(mouse_pos):
             return True
+        return False
 
     # 
-    def draw(self, screen, y_pos):
-        box = [(WIDTH / 8), y_pos, (6 * WIDTH / 8), 40]
-        pygame.draw.rect(screen, WHITE, box, 1, 5, 5, 5, 5)
+    def layout(self, y_pos):
+        rect_values = [(WIDTH / 8), y_pos, (6 * WIDTH / 8), 40]
+        self.rect = pygame.rect.Rect(rect_values)
 
-        self.icon_pos = [box[0] + 20, box[1] + box[3] / 2]
-        screen.blit(self.icon, self.icon.get_rect(center = (box[0] + 20, box[1] + box[3] / 2)))
+        self.icon_pos = [self.rect.x + 20, self.rect.y + self.rect.width / 2]
+
+    def draw(self, screen):
+        if self.rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, DARK_GRAY, self.rect, 0, 5, 5, 5, 5)
+        else:
+            pygame.draw.rect(screen, WHITE, self.rect, 1, 5, 5, 5, 5)
+
+        screen.blit(self.icon, self.icon.get_rect(center = (self.rect.x + 20, self.rect.y + self.rect.height / 2)))
 
         song_title = self.name_font.render(f"{self.file.split('/')[1]}", True, WHITE)
-        screen.blit(song_title, (box[0] + 50, box[1] + box[3] / 2 - song_title.get_height() / 2))
+        screen.blit(song_title, (self.rect.x + 50, self.rect.y + self.rect.height / 2 - song_title.get_height() / 2))
