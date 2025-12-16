@@ -37,6 +37,7 @@ class MusicApp():
 
         # Current song variables
         self.curr_song = None
+        self.curr_song_sound = None
         self.playing = False
 
         # Song setup
@@ -61,12 +62,55 @@ class MusicApp():
     # 
 
     def draw_navbar(self):
+        # Draw a simple navbar for the app
         nav_title = self.font.render("Music App", True, WHITE)
         self.screen.blit(nav_title, (WIDTH / 8 - nav_title.get_width() / 2, 5))
 
     def draw_songs(self):
+        # Call each song's draw function
         for song in self.songs:
             song.draw(self.screen)
+
+    def draw_footer(self):
+        # Contains the current song file name and a progress bar
+        curr_song_title = self.font16.render(f"{self.curr_song.file.split("/")[1]}", True, WHITE)
+        self.screen.blit(curr_song_title, (WIDTH / 2 - curr_song_title.get_width() / 2, HEIGHT - curr_song_title.get_height() * 2 - 5))
+
+        # Calculate the progress bar size
+        PROGRESS_WIDTH = WIDTH / 2
+
+        if self.curr_song != None:
+            # Get progress and total length of current song
+            curr_progress = int(pygame.mixer.music.get_pos() / 1000)
+            curr_song_length = int(pygame.mixer.Sound.get_length(self.curr_song_sound))
+
+            if curr_progress % 60 < 10:
+                progress_time = f"{int(curr_progress / 60)}:0{curr_progress % 60}"
+            else:
+                progress_time = f"{int(curr_progress / 60)}:{curr_progress % 60}"
+
+            if curr_song_length % 60 < 10:
+                song_time = f"{int(curr_song_length / 60)}:0{curr_song_length % 60}"
+            else:
+                song_time = f"{int(curr_song_length / 60)}:{curr_song_length % 60}"
+
+            # Put times on screen
+            progress_time_label = self.font16.render(progress_time, True, WHITE)
+            self.screen.blit(progress_time_label, (WIDTH / 2 - PROGRESS_WIDTH / 2 - progress_time_label.get_width() - 5, HEIGHT - 20 - progress_time_label.get_height() / 2))
+
+            song_time_label = self.font16.render(song_time, True, WHITE)
+            self.screen.blit(song_time_label, (WIDTH / 2 + PROGRESS_WIDTH / 2 + 5, HEIGHT - 20 - song_time_label.get_height() / 2))
+            
+            # Calculate width of progress Rect and the width of the Rect for the rest of the song
+            progress_bar_width = (curr_progress / curr_song_length) * PROGRESS_WIDTH
+            rest_bar_width = PROGRESS_WIDTH - progress_bar_width
+
+            # Create Rect objects for both bars
+            progress_bar = pygame.rect.Rect((WIDTH / 2 - PROGRESS_WIDTH / 2), HEIGHT - 20, progress_bar_width, 3)
+            pygame.draw.rect(self.screen, WHITE, progress_bar)
+
+            rest_bar = pygame.rect.Rect(progress_bar.right, HEIGHT - 20, rest_bar_width, 3)
+            pygame.draw.rect(self.screen, DARK_GRAY, rest_bar)
 
     # Home
     def draw_home(self):
@@ -101,6 +145,8 @@ class MusicApp():
                                         pygame.mixer.music.load(self.curr_song.file)
                                         self.curr_song.loaded = True
 
+                                        self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
+
                                     # Play the song and update program states, which updates the UI
                                     pygame.mixer.music.play()
                                     self.playing = True
@@ -117,6 +163,8 @@ class MusicApp():
                                     self.curr_song = song
                                     pygame.mixer.music.load(self.curr_song.file)
                                     self.curr_song.loaded = True
+
+                                    self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
 
                                     # Play new song and update program states, which updates the UI
                                     pygame.mixer.music.play()
@@ -147,6 +195,9 @@ class MusicApp():
             # Draw screen
             self.draw_navbar()
             self.draw_home()
+
+            if self.curr_song != None:
+                self.draw_footer()
 
             # Update display
             pygame.display.flip()
