@@ -184,6 +184,19 @@ class MusicApp():
                                             pygame.mixer.music.unpause()
                                             self.curr_song.update(self.playing)
 
+                    elif event.button == 4:
+                        # Scroll up
+                        top_song = self.songs[0].rect.y
+
+                        for song in self.songs:
+                            if top_song < 150:
+                                song.rect.y += 5
+                        else:
+                            self.scroll_offset = 0
+                    # Scroll down
+                    elif event.button == 5:
+                        for song in self.songs:
+                                song.rect.y -= 5
 
 
             # Get delta time
