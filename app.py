@@ -47,7 +47,7 @@ class MusicApp():
 
     # Creates a Song object for every file found. Song object do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
-        y_pos = 150 - self.scroll_offset
+        y_pos = 100
 
         for song_file in playlists[0][2]:
             obj = Song(song_file, self.play_icon, self.pause_icon)
@@ -61,17 +61,16 @@ class MusicApp():
     # Screens
     # 
 
-    def draw_navbar(self):
-        # Draw a simple navbar for the app
-        nav_title = self.font.render("Music App", True, WHITE)
-        self.screen.blit(nav_title, (WIDTH / 8 - nav_title.get_width() / 2, 5))
-
     def draw_songs(self):
         # Call each song's draw function
         for song in self.songs:
             song.draw(self.screen)
 
     def draw_footer(self):
+        # Background rect
+        footer_rect = pygame.rect.Rect(0, HEIGHT - 60, WIDTH, 60)
+        pygame.draw.rect(self.screen, DARKER_GRAY, footer_rect)
+
         # Contains the current song file name and a progress bar
         curr_song_title = self.font16.render(f"{self.curr_song.file.split("/")[1]}", True, WHITE)
         self.screen.blit(curr_song_title, (WIDTH / 2 - curr_song_title.get_width() / 2, HEIGHT - curr_song_title.get_height() * 2 - 5))
@@ -114,8 +113,8 @@ class MusicApp():
 
     # Home
     def draw_home(self):
-        all_playlists = self.title_font.render("Your Music", True, WHITE)
-        self.screen.blit(all_playlists, (WIDTH / 2 - all_playlists.get_width() / 2, all_playlists.get_height() + 5))
+        your_music_title = self.title_font.render("Your Music", True, WHITE)
+        self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, self.songs[0].rect.y - your_music_title.get_height() - 5))
 
         self.draw_songs()
 
@@ -184,6 +183,20 @@ class MusicApp():
                                             pygame.mixer.music.unpause()
                                             self.curr_song.update(self.playing)
 
+                    elif event.button == 4:
+                        # Scroll up
+                        top_song = self.songs[0].rect.y
+
+                        for song in self.songs:
+                            if top_song < 100:
+                                song.rect.y += 8
+                    # Scroll down
+                    elif event.button == 5:
+                        bottom_song = self.songs[-1].rect.y + self.songs[-1].rect.height
+
+                        for song in self.songs:
+                            if bottom_song > self.screen.get_height() - 75:
+                                song.rect.y -= 8
 
 
             # Get delta time
@@ -193,7 +206,6 @@ class MusicApp():
             self.screen.fill(BLACK)
 
             # Draw screen
-            self.draw_navbar()
             self.draw_home()
 
             if self.curr_song != None:

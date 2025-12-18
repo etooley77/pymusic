@@ -5,4 +5,5 @@ HEIGHT = 600
 # Colors
 BLACK = (11, 11, 11)
 DARK_GRAY = (58, 58, 58)
+DARKER_GRAY = (40, 40, 40)
 WHITE = (255, 255, 255)
