@@ -47,7 +47,7 @@ class MusicApp():
 
     # Creates a Song object for every file found. Song object do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
-        y_pos = 50
+        y_pos = 100
 
         for song_file in playlists[0][2]:
             obj = Song(song_file, self.play_icon, self.pause_icon)
@@ -114,7 +114,7 @@ class MusicApp():
     # Home
     def draw_home(self):
         your_music_title = self.title_font.render("Your Music", True, WHITE)
-        self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, your_music_title.get_height() + 5))
+        self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, self.songs[0].rect.y - your_music_title.get_height() - 5))
 
         self.draw_songs()
 
@@ -188,17 +188,15 @@ class MusicApp():
                         top_song = self.songs[0].rect.y
 
                         for song in self.songs:
-                            if top_song < 150:
-                                song.rect.y += 5
-                        else:
-                            self.scroll_offset = 0
+                            if top_song < 100:
+                                song.rect.y += 8
                     # Scroll down
                     elif event.button == 5:
                         bottom_song = self.songs[-1].rect.y + self.songs[-1].rect.height
 
                         for song in self.songs:
                             if bottom_song > self.screen.get_height() - 75:
-                                song.rect.y -= 5
+                                song.rect.y -= 8
 
 
             # Get delta time
