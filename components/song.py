@@ -2,8 +2,6 @@ import pygame
 
 from constants import WIDTH, WHITE, DARK_GRAY
 
-from helpers import distance
-
 # 
 class Song():
     def __init__(self, file, play_button, pause_button):
