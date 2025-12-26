@@ -45,7 +45,7 @@ class MusicApp():
 
         self.setup()
 
-    # Creates a Song object for every file found. Song object do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
+    # Creates a Song object for every file found. Song objects do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
         y_pos = 100
 
