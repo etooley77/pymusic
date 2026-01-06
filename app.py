@@ -199,7 +199,7 @@ class MusicApp():
                                 song.rect.y -= 8
 
 
-            # Get delta time
+            # Get delta time (time change)
             # dt = self.clock.tick(60)
             
             # Clear screen for next frame
