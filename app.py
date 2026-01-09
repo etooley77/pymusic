@@ -1,5 +1,6 @@
 import pygame
 import sys
+import shutil
 
 from constants import *
 from components.playlists import playlists
@@ -7,6 +8,8 @@ from components.playlists import playlists
 from components.button import TextButton
 from components.song import Song
 # from components.playlist import Playlist
+
+from components.filedialog import open_file_dialog
 
 # 
 class MusicApp():
@@ -45,7 +48,7 @@ class MusicApp():
 
         self.setup()
 
-    # Creates a Song object for every file found. Song object do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
+    # Creates a Song object for every file found. Song objects do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
         y_pos = 100
 
@@ -56,6 +59,37 @@ class MusicApp():
             # Define a layout for the current song, and define the starting position for the next song, so no overlapping occurs
             obj.layout(y_pos)
             y_pos += 50
+
+    def setup_selected(self, sel_songs):
+        # Add new selected songs below existing ones
+        y_pos = 100 + (len(self.songs) * 50)
+        dest = "music/"
+
+        for song_file in sel_songs:
+            song_file_split = "music/" + song_file.split("/")[-1]
+            print(song_file_split)
+            print(self.songs)
+
+            # Check if the file already exists
+            if not song_file_split in [s.file for s in self.songs]:
+                obj = Song(song_file_split, self.play_icon, self.pause_icon)
+                self.songs.append(obj)
+
+                # Define a layout
+                obj.layout(y_pos)
+                y_pos += 50
+
+                # Move file to music folder
+                shutil.copy(song_file, dest)
+                # shutil.move(song_file, dest)
+            else:
+                print("\n\nSong file already exists!\n\n")
+
+    def upload_songs(self):
+        selected_file = open_file_dialog()
+
+        if selected_file:
+            self.setup_selected([selected_file])
 
     # 
     # Screens
@@ -128,7 +162,8 @@ class MusicApp():
                 # 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        pass
+                        # Run the upload function
+                        self.upload_songs()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         mouse_pos = pygame.mouse.get_pos()
@@ -199,7 +234,7 @@ class MusicApp():
                                 song.rect.y -= 8
 
 
-            # Get delta time
+            # Get delta time (time change)
             # dt = self.clock.tick(60)
             
             # Clear screen for next frame
