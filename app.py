@@ -47,6 +47,7 @@ class MusicApp():
         self.songs = []
 
         self.setup()
+        self.define_playlist()
 
     # Creates a Song object for every file found. Song objects do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
@@ -99,8 +100,6 @@ class MusicApp():
     # 
 
     def draw_songs(self):
-        self.define_playlist()
-
         y_pos = 100
 
         # Call each song's draw function
@@ -120,7 +119,7 @@ class MusicApp():
         self.screen.blit(curr_song_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - curr_song_title.get_width() / 2, HEIGHT - curr_song_title.get_height() * 2 - 5))
 
         # Calculate the progress bar size
-        PROGRESS_WIDTH = WIDTH / 4
+        PROGRESS_WIDTH = 3 * WIDTH / 8
 
         if self.curr_song != None:
             # Get progress and total length of current song
@@ -175,11 +174,15 @@ class MusicApp():
                         # Run the upload function
                         self.upload_songs()
                     if event.key == pygame.K_ESCAPE:
-                        self.curr_playlist_id = 0
-                        self.run()
+                        if self.curr_playlist_id != 0:
+                            self.curr_playlist_id = 0
+                            self.define_playlist()
+                            self.run()
                     if event.key == pygame.K_1:
-                        self.curr_playlist_id = 1
-                        self.run()
+                        if self.curr_playlist_id != 1:
+                            self.curr_playlist_id = 1
+                            self.define_playlist()
+                            self.run()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         mouse_pos = pygame.mouse.get_pos()
