@@ -31,7 +31,7 @@ class MusicApp():
         self.curr_playlist_id = 0
         self.curr_playlist_songs = []
 
-        self.scroll_offset = 0
+        self.sidebar_offset = 200
 
         # Font
         self.title_font = pygame.font.Font("assets/bold.ttf", 48)

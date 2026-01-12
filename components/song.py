@@ -1,6 +1,6 @@
 import pygame
 
-from constants import WIDTH, WHITE, DARK_GRAY
+from constants import WIDTH, WHITE, DARK_GRAY, SIDEBAR_WIDTH
 
 # 
 class Song():
@@ -33,7 +33,7 @@ class Song():
 
     # 
     def layout(self, y_pos):
-        rect_values = [(WIDTH / 8), y_pos, (6 * WIDTH / 8), 40]
+        rect_values = [SIDEBAR_WIDTH + (WIDTH / 8), y_pos, (4 * (WIDTH) / 8), 40]
         self.rect = pygame.rect.Rect(rect_values)
 
         self.icon_pos = [self.rect.x + 20, self.rect.y + self.rect.width / 2]
