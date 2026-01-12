@@ -112,15 +112,15 @@ class MusicApp():
 
     def draw_footer(self):
         # Background rect
-        footer_rect = pygame.rect.Rect(0, HEIGHT - 60, WIDTH, 60)
+        footer_rect = pygame.rect.Rect((WIDTH / 4), HEIGHT - 60, WIDTH, 60)
         pygame.draw.rect(self.screen, DARKER_GRAY, footer_rect)
 
         # Contains the current song file name and a progress bar
         curr_song_title = self.font16.render(f"{self.curr_song.file.split("/")[1]}", True, WHITE)
-        self.screen.blit(curr_song_title, (WIDTH / 2 - curr_song_title.get_width() / 2, HEIGHT - curr_song_title.get_height() * 2 - 5))
+        self.screen.blit(curr_song_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - curr_song_title.get_width() / 2, HEIGHT - curr_song_title.get_height() * 2 - 5))
 
         # Calculate the progress bar size
-        PROGRESS_WIDTH = WIDTH / 2
+        PROGRESS_WIDTH = WIDTH / 4
 
         if self.curr_song != None:
             # Get progress and total length of current song
@@ -139,17 +139,17 @@ class MusicApp():
 
             # Put times on screen
             progress_time_label = self.font16.render(progress_time, True, WHITE)
-            self.screen.blit(progress_time_label, (WIDTH / 2 - PROGRESS_WIDTH / 2 - progress_time_label.get_width() - 5, HEIGHT - 20 - progress_time_label.get_height() / 2))
+            self.screen.blit(progress_time_label, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - PROGRESS_WIDTH / 2 - progress_time_label.get_width() - 5, HEIGHT - 20 - progress_time_label.get_height() / 2))
 
             song_time_label = self.font16.render(song_time, True, WHITE)
-            self.screen.blit(song_time_label, (WIDTH / 2 + PROGRESS_WIDTH / 2 + 5, HEIGHT - 20 - song_time_label.get_height() / 2))
+            self.screen.blit(song_time_label, (WIDTH / 2 + SIDEBAR_WIDTH / 2 + PROGRESS_WIDTH / 2 + 5, HEIGHT - 20 - song_time_label.get_height() / 2))
             
             # Calculate width of progress Rect and the width of the Rect for the rest of the song
             progress_bar_width = (curr_progress / curr_song_length) * PROGRESS_WIDTH
             rest_bar_width = PROGRESS_WIDTH - progress_bar_width
 
             # Create Rect objects for both bars
-            progress_bar = pygame.rect.Rect((WIDTH / 2 - PROGRESS_WIDTH / 2), HEIGHT - 20, progress_bar_width, 3)
+            progress_bar = pygame.rect.Rect((WIDTH / 2 + SIDEBAR_WIDTH / 2 - PROGRESS_WIDTH / 2), HEIGHT - 20, progress_bar_width, 3)
             pygame.draw.rect(self.screen, WHITE, progress_bar)
 
             rest_bar = pygame.rect.Rect(progress_bar.right, HEIGHT - 20, rest_bar_width, 3)
@@ -160,7 +160,7 @@ class MusicApp():
         self.draw_songs()
 
         your_music_title = self.title_font.render(playlists[self.curr_playlist_id][1], True, WHITE)
-        self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, self.curr_playlist_songs[0].rect.y - your_music_title.get_height() - 5))
+        self.screen.blit(your_music_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - your_music_title.get_width() / 2, self.curr_playlist_songs[0].rect.y - your_music_title.get_height() - 5))
 
     def home(self):
         self.on_screen = True

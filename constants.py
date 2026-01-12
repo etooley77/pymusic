@@ -1,7 +1,7 @@
 # Screen vars
 WIDTH = 800
 HEIGHT = 600
-SIDEBAR_WIDTH = WIDTH / 8
+SIDEBAR_WIDTH = WIDTH / 4
 
 # Colors
 BLACK = (11, 11, 11)
