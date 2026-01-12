@@ -28,9 +28,6 @@ class MusicApp():
         self.play_icon = pygame.image.load("assets/play.png").convert_alpha()
         self.pause_icon = pygame.image.load("assets/pause.png").convert_alpha()
 
-        self.curr_screen = "HOME"
-        self.on_screen = True
-
         self.curr_playlist_id = 0
         self.curr_playlist_songs = []
 
@@ -60,8 +57,11 @@ class MusicApp():
             self.songs.append(obj)
 
             # Define a layout for the current song, and define the starting position for the next song, so no overlapping occurs
-            obj.layout(y_pos)
-            y_pos += 50
+            # obj.layout(y_pos)
+            # y_pos += 50
+
+    def define_playlist(self):
+        self.curr_playlist_songs = [song for song in self.songs if song.file in playlists[self.curr_playlist_id][2]]
 
     def setup_selected(self, sel_songs):
         # Add new selected songs below existing ones
@@ -99,12 +99,15 @@ class MusicApp():
     # 
 
     def draw_songs(self):
-        # Call each song's draw function
-        for song in self.songs:
-            song.draw(self.screen)
+        self.define_playlist()
 
-    def draw_playlist_songs(self, songs):
-        for song in songs:
+        y_pos = 100
+
+        # Call each song's draw function
+        for song in self.curr_playlist_songs:
+            song.layout(y_pos)
+            y_pos += 50
+
             song.draw(self.screen)
 
     def draw_footer(self):
@@ -154,10 +157,10 @@ class MusicApp():
 
     # Home
     def draw_home(self):
-        your_music_title = self.title_font.render("Your Music", True, WHITE)
-        self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, self.songs[0].rect.y - your_music_title.get_height() - 5))
-
         self.draw_songs()
+
+        your_music_title = self.title_font.render("Your Music", True, WHITE)
+        self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, self.curr_playlist_songs[0].rect.y - your_music_title.get_height() - 5))
 
     def home(self):
         self.on_screen = True
@@ -172,7 +175,6 @@ class MusicApp():
                         # Run the upload function
                         self.upload_songs()
                     if event.key == pygame.K_1:
-                        self.curr_screen = "PLAYLIST"
                         self.curr_playlist_id = 1
 
                         self.run()
@@ -180,7 +182,7 @@ class MusicApp():
                     if event.button == 1:
                         mouse_pos = pygame.mouse.get_pos()
 
-                        for song in self.songs:
+                        for song in self.curr_playlist_songs:
                             # Check which song was clicked
                             if song.check_click(mouse_pos):
                                 # If no current song (usually only at start of program)
@@ -232,16 +234,16 @@ class MusicApp():
 
                     elif event.button == 4:
                         # Scroll up
-                        top_song = self.songs[0].rect.y
+                        top_song = self.curr_playlist_songs[0].rect.y
 
-                        for song in self.songs:
+                        for song in self.curr_playlist_songs:
                             if top_song < 100:
                                 song.rect.y += 8
                     # Scroll down
                     elif event.button == 5:
-                        bottom_song = self.songs[-1].rect.y + self.songs[-1].rect.height
+                        bottom_song = self.curr_playlist_songs[-1].rect.y + self.curr_playlist_songs[-1].rect.height
 
-                        for song in self.songs:
+                        for song in self.curr_playlist_songs:
                             if bottom_song > self.screen.get_height() - 75:
                                 song.rect.y -= 8
 
@@ -261,37 +263,6 @@ class MusicApp():
             # Update display
             pygame.display.flip()
 
-    # Playlist
-    def draw_playlist(self, playlist):
-        playlist_title = self.title_font.render(playlist[1], True, WHITE)
-        self.screen.blit(playlist_title, (WIDTH / 2 - playlist_title.get_width() / 2, self.songs[0].rect.y - playlist_title.get_height() - 5))
-
-        # Get playlist song objects, not just string of song's location
-        self.draw_playlist_songs([song for song in self.songs if song.file in playlist[2]])
-
-    def playlist(self, id):
-        self.on_screen = True
-        while self.on_screen:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    pass
-
-            self.screen.fill(BLACK)
-
-            self.draw_playlist(playlists[id])
-            if self.curr_song != None:
-                self.draw_footer()
-
-            pygame.display.flip()
-
     # Run function
     def run(self):
-        match self.curr_screen:
-            case "HOME":
-                self.home()
-                self.curr_playlist_id = 0
-            case "PLAYLIST":
-                self.playlist(self.curr_playlist_id)
+        self.home()
