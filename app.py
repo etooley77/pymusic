@@ -159,7 +159,7 @@ class MusicApp():
     def draw_home(self):
         self.draw_songs()
 
-        your_music_title = self.title_font.render("Your Music", True, WHITE)
+        your_music_title = self.title_font.render(playlists[self.curr_playlist_id][1], True, WHITE)
         self.screen.blit(your_music_title, (WIDTH / 2 - your_music_title.get_width() / 2, self.curr_playlist_songs[0].rect.y - your_music_title.get_height() - 5))
 
     def home(self):
@@ -174,9 +174,11 @@ class MusicApp():
                     if event.key == pygame.K_SPACE:
                         # Run the upload function
                         self.upload_songs()
+                    if event.key == pygame.K_ESCAPE:
+                        self.curr_playlist_id = 0
+                        self.run()
                     if event.key == pygame.K_1:
                         self.curr_playlist_id = 1
-
                         self.run()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
