@@ -1,9 +1,11 @@
 # Screen vars
 WIDTH = 800
 HEIGHT = 600
+SIDEBAR_WIDTH = WIDTH / 4
 
 # Colors
 BLACK = (11, 11, 11)
 DARK_GRAY = (58, 58, 58)
 DARKER_GRAY = (40, 40, 40)
+DARKEST_GRAY = (22, 22, 22)
 WHITE = (255, 255, 255)
