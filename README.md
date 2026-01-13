@@ -3,6 +3,11 @@
 Basic music player app using user-uploaded files.
 
 ## Features
-- [x] Music play/pause
-- [x] Music upload
-- [x] Functional UI (scrolling, etc.) 
+- Music play/pause
+- Music upload
+- Functional UI (scrolling, etc.)
+
+## In Development/Future Development
+- Shuffle feature
+- Playlist creature
+- Functional application build
