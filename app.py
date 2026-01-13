@@ -252,18 +252,18 @@ class MusicApp():
                                         self.playing = True
                                         self.curr_song.update(self.playing)
 
-                                # If the user clicks on the same song (pause/unpause functionality)
-                                else:
-                                    # Make sure that the user cannot pause or unpause songs before a song has even been played
-                                    if self.curr_song != None:
-                                        if self.playing: # Song is playing -> pause
-                                            self.playing = False
-                                            pygame.mixer.music.pause()
-                                            self.curr_song.update(self.playing)
-                                        else: # Song is paused -> unpause
-                                            self.playing = True
-                                            pygame.mixer.music.unpause()
-                                            self.curr_song.update(self.playing)
+                                    # If the user clicks on the same song (pause/unpause functionality)
+                                    else:
+                                        # Make sure that the user cannot pause or unpause songs before a song has even been played
+                                        if self.curr_song != None:
+                                            if self.playing: # Song is playing -> pause
+                                                self.playing = False
+                                                pygame.mixer.music.pause()
+                                                self.curr_song.update(self.playing)
+                                            else: # Song is paused -> unpause
+                                                self.playing = True
+                                                pygame.mixer.music.unpause()
+                                                self.curr_song.update(self.playing)
                         else:
                             for button in self.playlists:
                                 if button.check_click(mouse_pos):
