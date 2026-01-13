@@ -61,6 +61,13 @@ class MusicApp():
             # obj.layout(y_pos)
             # y_pos += 50
 
+    def layout(self):
+        y_pos = 100
+
+        for song in self.curr_playlist_songs:
+            song.layout(y_pos)
+            y_pos += 50
+
     def define_playlist(self):
         self.curr_playlist_songs = [song for song in self.songs if song.file in playlists[self.curr_playlist_id][2]]
 
@@ -100,13 +107,8 @@ class MusicApp():
     # 
 
     def draw_songs(self):
-        y_pos = 100
-
         # Call each song's draw function
         for song in self.curr_playlist_songs:
-            song.layout(y_pos)
-            y_pos += 50
-
             song.draw(self.screen)
 
     def draw_footer(self):
@@ -171,6 +173,16 @@ class MusicApp():
                 # 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        if self.curr_song != None:
+                            if self.playing: # Song is playing -> pause
+                                self.playing = False
+                                pygame.mixer.music.pause()
+                                self.curr_song.update(self.playing)
+                            else: # Song is paused -> unpause
+                                self.playing = True
+                                pygame.mixer.music.unpause()
+                                self.curr_song.update(self.playing)
+                    if event.key == pygame.K_u:
                         # Run the upload function
                         self.upload_songs()
                     if event.key == pygame.K_ESCAPE:
@@ -241,15 +253,15 @@ class MusicApp():
                         # Scroll up
                         top_song = self.curr_playlist_songs[0].rect.y
 
-                        for song in self.curr_playlist_songs:
-                            if top_song < 100:
+                        if top_song < 100:
+                            for song in self.curr_playlist_songs:
                                 song.rect.y += 8
                     # Scroll down
                     elif event.button == 5:
                         bottom_song = self.curr_playlist_songs[-1].rect.y + self.curr_playlist_songs[-1].rect.height
 
-                        for song in self.curr_playlist_songs:
-                            if bottom_song > self.screen.get_height() - 75:
+                        if bottom_song > self.screen.get_height() - 75:
+                            for song in self.curr_playlist_songs:
                                 song.rect.y -= 8
 
 
@@ -270,4 +282,5 @@ class MusicApp():
 
     # Run function
     def run(self):
+        self.layout()
         self.home()
