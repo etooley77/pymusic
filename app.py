@@ -92,6 +92,8 @@ class MusicApp():
             if not song_file_split in [s.file for s in self.songs]:
                 obj = Song(song_file_split, self.play_icon, self.pause_icon)
                 self.songs.append(obj)
+                if self.curr_playlist_id == 0:
+                    self.curr_playlist_songs.append(obj)
 
                 # Define a layout
                 obj.layout(y_pos)
