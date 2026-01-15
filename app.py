@@ -1,11 +1,11 @@
 import pygame
 import sys
-import shutil
+import shutil, os
 
 from constants import *
 from components.playlists import playlists
 
-from components.button import TextButton
+from components.button import *
 from components.song import Song
 # from components.playlist import Playlist
 
@@ -22,12 +22,16 @@ class MusicApp():
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Music Listener")
         
+        # Icons
         icon = pygame.image.load("assets/icon.ico").convert_alpha()
         pygame.display.set_icon(icon)
-
         self.play_icon = pygame.image.load("assets/play.png").convert_alpha()
         self.pause_icon = pygame.image.load("assets/pause.png").convert_alpha()
 
+        # Buttons
+        self.upload_btn = None
+
+        # Playlist song handling
         self.playlists = []
         self.curr_playlist_id = 0
         self.curr_playlist_songs = []
@@ -60,36 +64,46 @@ class MusicApp():
             self.songs.append(obj)
 
         for playlist in playlists:
-            btn = TextButton(SIDEBAR_WIDTH - 20, 40, f"{playlist[1]}")
+            btn = TextButtonBorder(SIDEBAR_WIDTH - SIDEBAR_WIDTH / 10, 40, f"{playlist[1]}")
             self.playlists.append(btn)
+
+        # Create upload button
+        self.upload_btn = TextButton(SIDEBAR_WIDTH - SIDEBAR_WIDTH / 10, 40, "Upload songs")
 
     def layout(self):
         song_y_pos = 100
         playlist_y_pos = 50
 
+        # Song buttons
         for song in self.curr_playlist_songs:
             song.layout(song_y_pos)
             song_y_pos += 50
 
+        # Playlist buttons
         for playlist in self.playlists:
             playlist.layout(10, playlist_y_pos)
             playlist_y_pos += 50
+
+        # Functional buttons
+        self.upload_btn.layout(SIDEBAR_WIDTH / 20, HEIGHT - (self.upload_btn.height + 10))
 
     def define_playlist(self):
         self.curr_playlist_songs = [song for song in self.songs if song.file in playlists[self.curr_playlist_id][2]]
 
     def setup_selected(self, sel_songs):
         # Add new selected songs below existing ones
-        y_pos = 100 + (len(self.songs) * 50)
+        y_pos = self.curr_playlist_songs[-1].rect.bottom + 10
         dest = "music/"
 
         for song_file in sel_songs:
             song_file_split = "music/" + song_file.split("/")[-1]
-            print(song_file_split)
-            print(self.songs)
 
             # Check if the file already exists
             if not song_file_split in [s.file for s in self.songs]:
+                # Update playlists
+                playlists[0][2].append(song_file_split)
+
+                # Create an object for each song
                 obj = Song(song_file_split, self.play_icon, self.pause_icon)
                 self.songs.append(obj)
                 if self.curr_playlist_id == 0:
@@ -127,6 +141,9 @@ class MusicApp():
         # Create buttons for each playlist
         for playlist in self.playlists:
             playlist.draw(self.screen)
+
+        # Draw the upload button
+        self.upload_btn.draw(self.screen)
 
     def draw_songs(self):
         # Call each song's draw function
