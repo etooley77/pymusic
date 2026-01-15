@@ -9,5 +9,5 @@ Basic music player app using user-uploaded files.
 
 ## In Development/Future Development
 - Shuffle feature
-- Playlist creature
+- Playlist creation
 - Functional application build
