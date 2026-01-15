@@ -11,7 +11,7 @@ from components.song import Song
 
 from components.filedialog import open_file_dialog
 
-# 
+# App class
 class MusicApp():
     def __init__(self):
         pygame.init()
