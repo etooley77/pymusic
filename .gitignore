@@ -210,4 +210,7 @@ __marimo__/
 # Local folders and files
 components/playlists.py
 playlists.txt
+
 music/
+
+plans.md
