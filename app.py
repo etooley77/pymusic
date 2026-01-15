@@ -68,7 +68,7 @@ class MusicApp():
             self.playlists.append(btn)
 
         # Create upload button
-        self.upload_btn = TextButton(SIDEBAR_WIDTH - SIDEBAR_WIDTH / 10, 40, "Upload songs")
+        self.upload_btn = TextButton(SIDEBAR_WIDTH - SIDEBAR_WIDTH / 10, 40, "Upload more")
 
     def layout(self):
         song_y_pos = 100
@@ -289,6 +289,10 @@ class MusicApp():
                                     # Reload the screen
                                     self.define_playlist()
                                     self.run()
+
+                            # Check if the upload button was clicked
+                            if self.upload_btn.check_click(mouse_pos):
+                                self.upload_songs()
 
                     elif event.button == 4:
                         # Scroll up

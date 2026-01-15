@@ -57,7 +57,7 @@ class TextButton():
 
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(screen, DARKEST_GRAY, self.rect, 0, 5, 5, 5, 5)
-            pygame.draw.line(screen, WHITE, (self.rect.x, self.rect.centery + button_title.get_height() / 2 + 3), (self.rect.x + self.width, self.rect.centery + button_title.get_height() / 2 + 3), 1)
+            pygame.draw.line(screen, WHITE, (self.rect.centerx - button_title.get_width() / 2, self.rect.centery + button_title.get_height() / 2 + 3), (self.rect.centerx + button_title.get_width() / 2, self.rect.centery + button_title.get_height() / 2 + 3), 1)
         else:
             pygame.draw.rect(screen, DARKEST_GRAY, self.rect, 0, 5, 5, 5, 5)
 
