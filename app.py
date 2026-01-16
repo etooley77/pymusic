@@ -34,9 +34,6 @@ class MusicApp():
         # Playlist song handling
         self.playlists = []
         self.curr_playlist_id = 0
-        self.curr_playlist_songs = []
-
-        self.sidebar_offset = 200
 
         # Font
         self.title_font = pygame.font.Font("assets/bold.ttf", 48)
@@ -51,43 +48,47 @@ class MusicApp():
 
         # Song setup
         self.songs = []
+        self.curr_playlist_songs = []
 
         self.setup()
         self.define_playlist()
 
     # Creates a Song object for every file found. Song objects do not handle the music logic and functionality, but instead only handle things specific to every song, such as what file should be loaded, what should be drawn on screen, and the states that handle UI objects
     def setup(self):
-        y_pos = 100
-
+        # Create song objects for all the songs found in the "All Music" playlist
         for song_file in playlists[self.curr_playlist_id][2]:
             obj = Song(song_file, self.play_icon, self.pause_icon)
             self.songs.append(obj)
 
+        # Create button objects for each playlist
         for playlist in playlists:
             btn = TextButtonBorder(SIDEBAR_WIDTH - SIDEBAR_WIDTH / 10, 40, f"{playlist[1]}")
             self.playlists.append(btn)
 
-        # Create upload button
+        # Create upload button object
         self.upload_btn = TextButton(SIDEBAR_WIDTH - SIDEBAR_WIDTH / 10, 40, "Upload more")
 
     def layout(self):
+        # Starting y positions for the songs and playlist buttons
         song_y_pos = 100
         playlist_y_pos = 50
 
-        # Song buttons
+        # Call the layout function for each song
         for song in self.curr_playlist_songs:
             song.layout(song_y_pos)
             song_y_pos += 50
 
-        # Playlist buttons
+        # Call the layout function for each playlist button
         for playlist in self.playlists:
             playlist.layout(10, playlist_y_pos)
             playlist_y_pos += 50
 
         # Functional buttons
+        # Layout the upload button
         self.upload_btn.layout(SIDEBAR_WIDTH / 20, HEIGHT - (self.upload_btn.height + 10))
 
     def define_playlist(self):
+        # Add the song files from the selected playlist into `self.curr_playlist_songs`
         self.curr_playlist_songs = [song for song in self.songs if song.file in playlists[self.curr_playlist_id][2]]
 
     def setup_selected(self, sel_songs):
@@ -96,32 +97,35 @@ class MusicApp():
         dest = "music/"
 
         for song_file in sel_songs:
+            # Shorten the path to the song file
             song_file_split = "music/" + song_file.split("/")[-1]
 
             # Check if the file already exists
             if not song_file_split in [s.file for s in self.songs]:
-                # Update playlists
+                # Temporarily add the song manually to the playlist "All Music". Next time the program runs, it is added automatically because it is in the `music` folder.
                 playlists[0][2].append(song_file_split)
 
-                # Create an object for each song
+                # Create an object for each song and add it to `self.songs`. If the user is currently viewing the "All Music", then add the song object to `self.curr_playlist_songs` as well.
                 obj = Song(song_file_split, self.play_icon, self.pause_icon)
                 self.songs.append(obj)
                 if self.curr_playlist_id == 0:
                     self.curr_playlist_songs.append(obj)
 
-                # Define a layout
+                # Call the layout function of the song
                 obj.layout(y_pos)
                 y_pos += 50
 
-                # Move file to music folder
+                # Move/copy file to music folder
                 shutil.copy(song_file, dest)
                 # shutil.move(song_file, dest)
             else:
                 print("\n\nSong file already exists!\n\n")
 
     def upload_songs(self):
+        # Call the function to open the tkinter file dialog (from `components/filedialog.py`)
         selected_file = open_file_dialog()
 
+        # If a file was selected and opened
         if selected_file:
             self.setup_selected([selected_file])
 
@@ -129,6 +133,7 @@ class MusicApp():
     # Screens
     # 
 
+    # Components
     def draw_sidebar(self):
         # The background for the playlist sidebar
         sidebar_rect = pygame.rect.Rect(0, 0, SIDEBAR_WIDTH, HEIGHT)
@@ -151,33 +156,36 @@ class MusicApp():
             song.draw(self.screen)
 
     def draw_footer(self):
-        # Background rect
+        # Background of the footer rect
         footer_rect = pygame.rect.Rect((WIDTH / 4), HEIGHT - 60, WIDTH, 60)
         pygame.draw.rect(self.screen, DARKER_GRAY, footer_rect)
 
-        # Contains the current song file name and a progress bar
+        # The current song file that is playing
         curr_song_title = self.font16.render(f"{self.curr_song.file.split("/")[1]}", True, WHITE)
         self.screen.blit(curr_song_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - curr_song_title.get_width() / 2, HEIGHT - curr_song_title.get_height() * 2 - 5))
 
         # Calculate the progress bar size
         PROGRESS_WIDTH = 3 * WIDTH / 8
 
+        # Only display the progress bar if there is a song playing
         if self.curr_song != None:
             # Get progress and total length of current song
             curr_progress = int(pygame.mixer.music.get_pos() / 1000)
             curr_song_length = int(pygame.mixer.Sound.get_length(self.curr_song_sound))
 
+            # Display the amount of time that has passed
             if curr_progress % 60 < 10:
                 progress_time = f"{int(curr_progress / 60)}:0{curr_progress % 60}"
             else:
                 progress_time = f"{int(curr_progress / 60)}:{curr_progress % 60}"
 
+            # Get the total song length
             if curr_song_length % 60 < 10:
                 song_time = f"{int(curr_song_length / 60)}:0{curr_song_length % 60}"
             else:
                 song_time = f"{int(curr_song_length / 60)}:{curr_song_length % 60}"
 
-            # Put times on screen
+            # Display the times on either side of the progress bar
             progress_time_label = self.font16.render(progress_time, True, WHITE)
             self.screen.blit(progress_time_label, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - PROGRESS_WIDTH / 2 - progress_time_label.get_width() - 5, HEIGHT - 20 - progress_time_label.get_height() / 2))
 
@@ -188,20 +196,22 @@ class MusicApp():
             progress_bar_width = (curr_progress / curr_song_length) * PROGRESS_WIDTH
             rest_bar_width = PROGRESS_WIDTH - progress_bar_width
 
-            # Create Rect objects for both bars
+            # Create and draw Rect objects for both bars
             progress_bar = pygame.rect.Rect((WIDTH / 2 + SIDEBAR_WIDTH / 2 - PROGRESS_WIDTH / 2), HEIGHT - 20, progress_bar_width, 3)
             pygame.draw.rect(self.screen, WHITE, progress_bar)
 
             rest_bar = pygame.rect.Rect(progress_bar.right, HEIGHT - 20, rest_bar_width, 3)
             pygame.draw.rect(self.screen, DARK_GRAY, rest_bar)
 
-    # Home
+    # Home screen
     def draw_home(self):
+        # Call draw functions to draw screen elements
         self.draw_sidebar()
         self.draw_songs()
         if self.curr_song != None:
             self.draw_footer()
 
+        # Render either "All Music" or the name of the playlist
         your_music_title = self.title_font.render(playlists[self.curr_playlist_id][1], True, WHITE)
         self.screen.blit(your_music_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - your_music_title.get_width() / 2, self.curr_playlist_songs[0].rect.y - your_music_title.get_height() - 5))
 
@@ -212,7 +222,7 @@ class MusicApp():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                # 
+                # Keydown events
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if self.curr_song != None:
@@ -227,10 +237,12 @@ class MusicApp():
                     if event.key == pygame.K_u:
                         # Run the upload function
                         self.upload_songs()
+                # Mouse button events
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         mouse_pos = pygame.mouse.get_pos()
 
+                        # If the user clicks in the song panel
                         if mouse_pos[0] > SIDEBAR_WIDTH:
                             for song in self.curr_playlist_songs:
                                 # Check which song was clicked
@@ -281,7 +293,9 @@ class MusicApp():
                                                 self.playing = True
                                                 pygame.mixer.music.unpause()
                                                 self.curr_song.update(self.playing)
+                        # If the user clicks on the sidebar
                         else:
+                            # Check if the user clicks on one of the playlists
                             for button in self.playlists:
                                 if button.check_click(mouse_pos):
                                     self.curr_playlist_id = self.playlists.index(button)
@@ -294,14 +308,14 @@ class MusicApp():
                             if self.upload_btn.check_click(mouse_pos):
                                 self.upload_songs()
 
+                    # Scroll up event
                     elif event.button == 4:
-                        # Scroll up
                         top_song = self.curr_playlist_songs[0].rect.y
 
                         if top_song < 100:
                             for song in self.curr_playlist_songs:
                                 song.rect.y += 8
-                    # Scroll down
+                    # Scroll down event
                     elif event.button == 5:
                         bottom_song = self.curr_playlist_songs[-1].rect.y + self.curr_playlist_songs[-1].rect.height
 
