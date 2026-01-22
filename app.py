@@ -11,6 +11,8 @@ from components.song import Song
 
 from components.filedialog import open_file_dialog
 
+from helpers import check_file_name_length
+
 # App class
 class MusicApp():
     def __init__(self):
@@ -98,7 +100,7 @@ class MusicApp():
 
         for song_file in sel_songs:
             # Shorten the path to the song file
-            song_file_split = "music/" + song_file.split("/")[-1]
+            song_file_split = "music/" + check_file_name_length(song_file)
 
             # Check if the file already exists
             if not song_file_split in [s.file for s in self.songs]:
