@@ -1,6 +1,7 @@
 import pygame
 import sys
 import shutil, os
+from random import shuffle
 
 from constants import *
 from components.playlists import playlists
@@ -134,6 +135,27 @@ class MusicApp():
         if selected_file:
             self.setup_selected([selected_file])
 
+    def shuffle_play(self):
+        # Update the old song
+        pygame.mixer.music.stop()
+        self.playing = False
+
+        if self.curr_song is not None:
+            self.curr_song.update(self.playing)
+
+        self.curr_song = self.curr_playlist_shuffle[0]
+        if not self.curr_song.loaded:
+            # Loads the song to the mixer
+            pygame.mixer.music.load(self.curr_song.file)
+            self.curr_song.loaded = True
+
+            self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
+
+        # Play the song and update program states, which updates the UI
+        pygame.mixer.music.play()
+        self.playing = True
+        self.curr_song.update(self.playing)
+
     # 
     # Screens
     # 
@@ -179,25 +201,12 @@ class MusicApp():
             curr_song_length = int(pygame.mixer.Sound.get_length(self.curr_song_sound))
 
             # Check the state of the currently playing song
-            if curr_progress >= curr_song_length:
-                pygame.mixer.music.stop()
-
+            if curr_progress >= curr_song_length and self.curr_playlist_shuffle is not None:
                 # Remove the song that just ended
                 self.curr_playlist_shuffle.remove(self.curr_song)
 
                 # Play the next song in the shuffle
-                self.curr_song = self.curr_playlist_shuffle[0]
-                if not self.curr_song.loaded:
-                    # Loads the song to the mixer
-                    pygame.mixer.music.load(self.curr_song.file)
-                    self.curr_song.loaded = True
-
-                    self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
-
-                # Play the song and update program states, which updates the UI
-                pygame.mixer.music.play()
-                self.playing = True
-                self.curr_song.update(self.playing)
+                self.shuffle_play()
 
             # Display the amount of time that has passed
             if curr_progress % 60 < 10:
@@ -260,9 +269,15 @@ class MusicApp():
                                 self.playing = True
                                 pygame.mixer.music.unpause()
                                 self.curr_song.update(self.playing)
-                    if event.key == pygame.K_u:
-                        # Run the upload function
-                        self.upload_songs()
+                    if event.key == pygame.K_s:
+                        # Reshuffle the current playlist and start playing
+                        if self.curr_playlist_shuffle is not None:
+                            shuffle(self.curr_playlist_shuffle)
+                            self.shuffle_play()
+                        else:
+                            self.curr_playlist_shuffle = [song for song in self.curr_playlist_songs]
+                            shuffle(self.curr_playlist_shuffle)
+                            self.shuffle_play()
                 # Mouse button events
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
@@ -289,7 +304,7 @@ class MusicApp():
                                         self.curr_song.update(self.playing)
 
                                         # Shuffle the current playlist songs, without the current song
-                                        self.curr_playlist_shuffle = [song for song in self.curr_playlist_songs if song != self.curr_song]
+                                        self.curr_playlist_shuffle = shuffle([song for song in self.curr_playlist_songs if song != self.curr_song])
 
                                     # If the selected song is different than the current song
                                     elif song != self.curr_song:
