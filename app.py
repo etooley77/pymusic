@@ -38,8 +38,8 @@ class MusicApp():
         self.playlists = []
         self.curr_playlist_id = 0
 
-        # Handle shuffling
-        self.curr_playlist_shuffle = None
+        # Handle shuffling - curr_playlist_shuffle is the index of the currently playing song
+        self.curr_playlist_shuffle = 0
 
         # Font
         self.title_font = pygame.font.Font("assets/bold.ttf", 48)
@@ -140,21 +140,24 @@ class MusicApp():
         pygame.mixer.music.stop()
         self.playing = False
 
-        if self.curr_song is not None:
+        if self.curr_playlist_shuffle < len(self.curr_playlist_songs) - 1:
+            self.curr_playlist_shuffle += 1
+
+            if self.curr_song is not None:
+                self.curr_song.update(self.playing)
+
+            self.curr_song = self.curr_playlist_songs[self.curr_playlist_shuffle]
+            if not self.curr_song.loaded:
+                # Loads the song to the mixer
+                pygame.mixer.music.load(self.curr_song.file)
+                self.curr_song.loaded = True
+
+                self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
+
+            # Play the song and update program states, which updates the UI
+            pygame.mixer.music.play()
+            self.playing = True
             self.curr_song.update(self.playing)
-
-        self.curr_song = self.curr_playlist_shuffle[0]
-        if not self.curr_song.loaded:
-            # Loads the song to the mixer
-            pygame.mixer.music.load(self.curr_song.file)
-            self.curr_song.loaded = True
-
-            self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
-
-        # Play the song and update program states, which updates the UI
-        pygame.mixer.music.play()
-        self.playing = True
-        self.curr_song.update(self.playing)
 
     # 
     # Screens
@@ -202,9 +205,6 @@ class MusicApp():
 
             # Check the state of the currently playing song
             if curr_progress >= curr_song_length and self.curr_playlist_shuffle is not None:
-                # Remove the song that just ended
-                self.curr_playlist_shuffle.remove(self.curr_song)
-
                 # Play the next song in the shuffle
                 self.shuffle_play()
 
@@ -248,7 +248,7 @@ class MusicApp():
 
         # Render either "All Music" or the name of the playlist
         your_music_title = self.title_font.render(playlists[self.curr_playlist_id][1], True, WHITE)
-        self.screen.blit(your_music_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - your_music_title.get_width() / 2, self.curr_playlist_songs[0].rect.y - your_music_title.get_height() - 5))
+        self.screen.blit(your_music_title, (WIDTH / 2 + SIDEBAR_WIDTH / 2 - your_music_title.get_width() / 2, 28))
 
     def home(self):
         self.on_screen = True
@@ -271,13 +271,9 @@ class MusicApp():
                                 self.curr_song.update(self.playing)
                     if event.key == pygame.K_s:
                         # Reshuffle the current playlist and start playing
-                        if self.curr_playlist_shuffle is not None:
-                            shuffle(self.curr_playlist_shuffle)
-                            self.shuffle_play()
-                        else:
-                            self.curr_playlist_shuffle = [song for song in self.curr_playlist_songs]
-                            shuffle(self.curr_playlist_shuffle)
-                            self.shuffle_play()
+                        self.curr_playlist_shuffle = 0
+                        shuffle(self.curr_playlist_songs)
+                        self.shuffle_play()
                 # Mouse button events
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
