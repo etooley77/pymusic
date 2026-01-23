@@ -37,6 +37,9 @@ class MusicApp():
         self.playlists = []
         self.curr_playlist_id = 0
 
+        # Handle shuffling
+        self.curr_playlist_shuffle = None
+
         # Font
         self.title_font = pygame.font.Font("assets/bold.ttf", 48)
         self.font = pygame.font.Font("assets/regular.ttf", 24)
@@ -175,6 +178,27 @@ class MusicApp():
             curr_progress = int(pygame.mixer.music.get_pos() / 1000)
             curr_song_length = int(pygame.mixer.Sound.get_length(self.curr_song_sound))
 
+            # Check the state of the currently playing song
+            if curr_progress >= curr_song_length:
+                pygame.mixer.music.stop()
+
+                # Remove the song that just ended
+                self.curr_playlist_shuffle.remove(self.curr_song)
+
+                # Play the next song in the shuffle
+                self.curr_song = self.curr_playlist_shuffle[0]
+                if not self.curr_song.loaded:
+                    # Loads the song to the mixer
+                    pygame.mixer.music.load(self.curr_song.file)
+                    self.curr_song.loaded = True
+
+                    self.curr_song_sound = pygame.mixer.Sound(self.curr_song.file)
+
+                # Play the song and update program states, which updates the UI
+                pygame.mixer.music.play()
+                self.playing = True
+                self.curr_song.update(self.playing)
+
             # Display the amount of time that has passed
             if curr_progress % 60 < 10:
                 progress_time = f"{int(curr_progress / 60)}:0{curr_progress % 60}"
@@ -263,6 +287,9 @@ class MusicApp():
                                         pygame.mixer.music.play()
                                         self.playing = True
                                         self.curr_song.update(self.playing)
+
+                                        # Shuffle the current playlist songs, without the current song
+                                        self.curr_playlist_shuffle = [song for song in self.curr_playlist_songs if song != self.curr_song]
 
                                     # If the selected song is different than the current song
                                     elif song != self.curr_song:
