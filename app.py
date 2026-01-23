@@ -300,7 +300,13 @@ class MusicApp():
                                         self.curr_song.update(self.playing)
 
                                         # Shuffle the current playlist songs, without the current song
-                                        self.curr_playlist_shuffle = shuffle([song for song in self.curr_playlist_songs if song != self.curr_song])
+                                        shuffle(self.curr_playlist_songs)
+                                        
+                                        curr_song_index = self.curr_playlist_songs.index(self.curr_song)
+                                        
+                                        self.curr_playlist_songs[0], self.curr_playlist_songs[curr_song_index] = self.curr_playlist_songs[curr_song_index], self.curr_playlist_songs[0]
+
+                                        self.curr_playlist_shuffle = 1
 
                                     # If the selected song is different than the current song
                                     elif song != self.curr_song:
